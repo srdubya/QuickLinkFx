@@ -84,8 +84,12 @@ public class ImportController implements Initializable {
     }
 
     @FXML private void onFindFileRequest() {
+        File initialDirectory = new File(Main.appPreferences.get(LastFolder, System.getProperty("user.home")));
+        if (!initialDirectory.exists() || !initialDirectory.isDirectory()) {
+            initialDirectory = new File(System.getProperty("user.home"));
+        }
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(Main.appPreferences.get(LastFolder, System.getProperty("user.home"))));
+        fileChooser.setInitialDirectory(initialDirectory);
         fileChooser.setTitle("Open Resource File");
         fileChooser.getExtensionFilters().addAll(ChooserExtensions);
         fileChooser.setSelectedExtensionFilter(ChooserExtensions[Main.appPreferences.getInt(LastExtensionIndex, 0)]);

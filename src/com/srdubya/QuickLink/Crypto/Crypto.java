@@ -34,7 +34,7 @@ public class Crypto {
             if (os.contains("windows")) {
                 className = "com.sun.security.auth.module.NTSystem";
                 methodName = "getUserSID";
-            } else if (os.contains("linux")) {
+            } else if (os.contains("linux") || os.contains("mac os")) {
                 className = "com.sun.security.auth.module.UnixSystem";
                 methodName = "getUid";
             } else if (os.contains("solaris") || os.contains("sunos")) {
