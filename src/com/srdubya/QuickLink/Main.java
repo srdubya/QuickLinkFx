@@ -140,10 +140,12 @@ public class Main extends Application {
         try {
             File backupFile = getBackupFile();
             File file = getDataFile();
-            if(backupFile.exists()) {
-                Files.delete(backupFile.toPath());
+            if(file.exists()) {
+                if (backupFile.exists()) {
+                    Files.delete(backupFile.toPath());
+                }
+                Files.move(file.toPath(), backupFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
             }
-            Files.move(file.toPath(), backupFile.toPath(), StandardCopyOption.ATOMIC_MOVE);
             saveToFile(file);
         } catch(Exception e) {
             e.printStackTrace();
