@@ -11,6 +11,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Crypto {
 
@@ -30,22 +32,29 @@ public class Crypto {
         try {
             final String os = System.getProperty("os.name").toLowerCase();
             String className = null;
-            String methodName = null;
+            List<String> methodNames = new ArrayList<>();
             if (os.contains("windows")) {
                 className = "com.sun.security.auth.module.NTSystem";
-                methodName = "getUserSID";
+                methodNames.add("getUserSID");
+                methodNames.add("getDomainSID");
             } else if (os.contains("linux") || os.contains("mac os")) {
                 className = "com.sun.security.auth.module.UnixSystem";
-                methodName = "getUid";
+                methodNames.add("getUid");
+                methodNames.add("getGid");
             } else if (os.contains("solaris") || os.contains("sunos")) {
                 className = "com.sun.security.auth.module.SolarisSystem";
-                methodName = "getUid";
+                methodNames.add("getUid");
+                methodNames.add("getGid");
             }
             if (className != null) {
+                StringBuilder sb = new StringBuilder();
                 Class<?> c = Class.forName(className);
-                Method method = c.getDeclaredMethod(methodName);
-                Object o = c.newInstance();
-                return method.invoke(o).toString();
+                for(String methodName : methodNames) {
+                    Method method = c.getDeclaredMethod(methodName);
+                    Object o = c.newInstance();
+                    sb.append(method.invoke(o).toString());
+                }
+                return sb.toString();
             }
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
             e.printStackTrace();
