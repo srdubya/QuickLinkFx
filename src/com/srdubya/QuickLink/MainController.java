@@ -121,16 +121,17 @@ public final class MainController implements Initializable {
             }
 
             File app = new File(item.getApp());
-            if(Files.isExecutable(app.toPath())) {
+            if (app.exists() && Files.isExecutable(app.toPath())) {
                 new ProcessBuilder(app.getPath(), path).start();
             } else if (path.toLowerCase().startsWith("http")) {
                 Desktop.getDesktop().browse(new URI(path));
+            } else {
+                File file = new File(path);
+                if (!file.exists()) {
+                    return;
+                }
+                Desktop.getDesktop().open(file);
             }
-            File file = new File(path);
-            if (!file.exists()) {
-                return;
-            }
-            Desktop.getDesktop().open(file);
         } catch(Exception e) {
             e.printStackTrace();
         } finally {
