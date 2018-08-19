@@ -1,5 +1,6 @@
 package com.srdubya.QuickLink.Add;
 
+import com.srdubya.QuickLink.Crypto.Password;
 import com.srdubya.QuickLink.LinkEntry;
 import com.srdubya.QuickLink.Main;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -7,10 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.*;
 
@@ -25,11 +23,13 @@ public class AddController implements Initializable {
     private static final String LastPathDirectoryKey = "Add.Last.Path.Directory";
     private static final String LastPathFileKey = "Add.Last.Path.File";
     private static final String LastAppKey = "Add.Last.App";
+    private static final String LastPasswordLengthKey = "Add.Last.Password.Length";
 
     private boolean dialogResult;
 
     @FXML private Button findAppBtn;
     @FXML private Button findFolderBtn;
+    @FXML private Button findFileBtn;
     @FXML private Button okBtn;
     @FXML private TextField nameTextField;
     @FXML private TextField loginTextField;
@@ -38,9 +38,12 @@ public class AddController implements Initializable {
     @FXML private TextField pathTextField;
     @FXML private PasswordField passwordField;
     @FXML private TextField passwordTextField;
+    @FXML private TextField passwordLengthTextField;
+    @FXML private Button passwordGenerateBtn;
     @FXML private CheckBox exitUponUseCB;
 
     private Stage dialogStage;
+    private static AddController controller;
     private SimpleBooleanProperty viewingPassword;
 
     @Override
@@ -59,6 +62,20 @@ public class AddController implements Initializable {
         nameTextField.textProperty().addListener(((obs, oldVal, newVal) -> textChangedListener()));
         pathTextField.textProperty().addListener(((obs, oldVal, newVal) -> textChangedListener()));
         appTextField.textProperty().addListener(((obs, oldVal, newVal) -> textChangedListener()));
+
+        findFolderBtn.setTooltip(new Tooltip("Pick a folder..."));
+        findFileBtn.setTooltip(new Tooltip("Pick a file..."));
+
+        passwordLengthTextField.textProperty().addListener((observable, oldValue, newValue) -> numberChangedListener(newValue));
+    }
+
+    private void numberChangedListener(String newValue) {
+        try {
+            Integer.parseInt(newValue);
+            passwordGenerateBtn.setDisable(false);
+        } catch (NumberFormatException ex) {
+            passwordGenerateBtn.setDisable(true);
+        }
     }
 
     private void textChangedListener() {
@@ -85,6 +102,12 @@ public class AddController implements Initializable {
         dialogStage.initOwner(owner);
         Scene scene = new Scene(page);
         dialogStage.setScene(scene);
+        dialogStage.setOnShown(event -> {
+            controller.passwordLengthTextField.setText(
+                    Integer.toString(Main.appPreferences.getInt(LastPasswordLengthKey,8))
+            );
+            controller.passwordLengthTextField.setPrefWidth(controller.passwordGenerateBtn.getWidth());
+        });
 
         AddController controller = loader.getController();
         controller.dialogStage = dialogStage;
@@ -96,14 +119,14 @@ public class AddController implements Initializable {
     }
 
     public static void showAddDialog(Window owner, NewLinkEntryHandler handler ) throws IOException {
-        AddController controller = makeController(owner, handler);
+        controller = makeController(owner, handler);
         controller.dialogStage.setTitle("Add Link");
         controller.dialogResult = false;
         controller.dialogStage.showAndWait();
     }
 
     public static boolean showEditDialog(LinkEntry entry, Window owner, NewLinkEntryHandler handler) throws IOException {
-        AddController controller = makeController(owner, handler);
+        controller = makeController(owner, handler);
         controller.dialogStage.setTitle("Edit Link");
         controller.nameTextField.setText(entry.getName());
         controller.loginTextField.setText(entry.getLogin());
@@ -193,6 +216,12 @@ public class AddController implements Initializable {
             if (lastApp.exists() && Files.isExecutable(lastApp.toPath())) {
                 Main.appPreferences.put(LastAppKey, lastApp.getPath());
             }
+
+            try {
+                int pwLength = Integer.parseInt(passwordLengthTextField.getText());
+                Main.appPreferences.putInt(LastPasswordLengthKey, pwLength);
+            } catch (NumberFormatException ex) {
+            }
         }
         dialogStage.close();
     }
@@ -213,6 +242,15 @@ public class AddController implements Initializable {
 
     @FXML private void onViewBtnClicked() {
         viewingPassword.setValue(!viewingPassword.getValue());
+    }
+
+    @FXML private void onGeneratePasswordClicked() {
+        try {
+            int length = Integer.parseInt(this.passwordLengthTextField.getText());
+            passwordTextField.setText(Password.getPassword(length));
+        } catch (NumberFormatException ex) {
+            return;
+        }
     }
 
 }

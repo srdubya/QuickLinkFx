@@ -51,7 +51,7 @@ public class Crypto {
                 Class<?> c = Class.forName(className);
                 for(String methodName : methodNames) {
                     Method method = c.getDeclaredMethod(methodName);
-                    Object o = c.newInstance();
+                    Object o = c.getDeclaredConstructor().newInstance();
                     sb.append(method.invoke(o).toString());
                 }
                 return sb.toString();

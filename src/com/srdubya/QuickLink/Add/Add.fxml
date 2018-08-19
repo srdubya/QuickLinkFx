@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <!--suppress ALL -->
+
 <AnchorPane prefWidth="601.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.srdubya.QuickLink.Add.AddController">
    <children>
       <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -98,11 +101,6 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </GridPane.margin>
             </TextField>
-            <ToggleButton mnemonicParsing="false" onAction="#onViewBtnClicked" text="View" GridPane.columnIndex="2" GridPane.rowIndex="5">
-               <GridPane.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </GridPane.margin>
-            </ToggleButton>
             <FlowPane alignment="CENTER_RIGHT" columnHalignment="RIGHT" GridPane.columnSpan="3" GridPane.halignment="RIGHT" GridPane.rowIndex="7">
                <children>
                   <Button cancelButton="true" mnemonicParsing="false" onAction="#onCloseBtnClicked" text="Cancel">
@@ -131,11 +129,37 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                      </GridPane.margin>
                   </Button>
-                  <Button mnemonicParsing="false" onAction="#onChoosePathFile" text="..." GridPane.columnIndex="1">
+                  <Button fx:id="findFileBtn" mnemonicParsing="false" onAction="#onChoosePathFile" text="..." GridPane.columnIndex="1">
                      <GridPane.margin>
                         <Insets bottom="5.0" right="5.0" top="5.0" />
                      </GridPane.margin>
                   </Button>
+               </children>
+            </GridPane>
+            <GridPane GridPane.columnIndex="2" GridPane.rowIndex="5">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" />
+                <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="1.7976931348623157E308" />
+                  <ColumnConstraints fillWidth="false" hgrow="NEVER" maxWidth="1.7976931348623157E308" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <TextField fx:id="passwordLengthTextField" minWidth="-Infinity" promptText="Size" text="8" GridPane.columnIndex="1" GridPane.hgrow="NEVER">
+                     <GridPane.margin>
+                        <Insets bottom="5.0" right="5.0" top="5.0" />
+                     </GridPane.margin>
+                  </TextField>
+                  <ToggleButton mnemonicParsing="false" onAction="#onViewBtnClicked" text="View">
+                     <GridPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </GridPane.margin>
+                  </ToggleButton>
+                  <Button fx:id="passwordGenerateBtn" mnemonicParsing="false" onAction="#onGeneratePasswordClicked" text="Gen" GridPane.columnIndex="2">
+                     <GridPane.margin>
+                        <Insets right="5.0" />
+                     </GridPane.margin></Button>
                </children>
             </GridPane>
          </children>
