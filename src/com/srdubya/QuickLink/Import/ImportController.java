@@ -9,9 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -118,7 +116,7 @@ public class ImportController implements Initializable {
     }
 
     private String getExtension(String name) {
-        int index = name.indexOf('.');
+        int index = name.lastIndexOf('.');
         if(index > 0) {
             return name.substring(index + 1).toLowerCase();
         } else {
@@ -141,8 +139,13 @@ public class ImportController implements Initializable {
             }
             if (extension.equals("xml")) {
                 importXmlFile(file);
-            } else if (extension.equals("json")) {
-                importJsonFile(file);
+            } else if (extension.endsWith("json")) {
+                int count = importJsonFile(file);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Import Complete");
+                alert.setHeaderText(String.format("Imported %d links", count));
+                alert.setContentText(null);
+                alert.showAndWait();
             }
         } finally {
             if(isCryptoReInited) {
@@ -152,8 +155,8 @@ public class ImportController implements Initializable {
         }
     }
 
-    private void importJsonFile(File file) {
-        Main.addLinksFromFile(file);
+    private int importJsonFile(File file) {
+        return Main.addLinksFromFile(file);
     }
 
     private void importXmlFile(File file) throws ParserConfigurationException, SAXException, IOException {

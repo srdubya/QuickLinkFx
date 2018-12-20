@@ -161,10 +161,10 @@ public class Main extends Application {
         addLinksFromFile(getDataFile());
     }
 
-    public static void addLinksFromFile(File dataFile) {
+    public static int addLinksFromFile(File dataFile) {
         if (!dataFile.exists()) {
-            return;
+            return 0;
         }
-        LinkEntry.forEach(dataFile.getPath(), masterData::add);
+        return LinkEntry.forEach(dataFile.getPath(), masterData::add);
     }
 }

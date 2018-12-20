@@ -226,7 +226,8 @@ public class LinkEntry {
         void add(LinkEntry entry);
     }
 
-    public static void forEach(String filename, LinkEntryHandler adder) {
+    public static int forEach(String filename, LinkEntryHandler adder) {
+        int count = 0;
         try {
             JsonReader reader = new JsonReader(new FileReader(filename));
             LinkEntryBuilder builder = new LinkEntryBuilder();
@@ -236,6 +237,7 @@ public class LinkEntry {
                 builder.set(reader);
                 if (builder.isReady()) {
                     adder.add(builder.create());
+                    count++;
                 }
                 reader.endObject();
             }
@@ -243,5 +245,6 @@ public class LinkEntry {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return count;
     }
 }
