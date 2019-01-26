@@ -1,0 +1,24 @@
+#/bin/bash
+
+JDK=jdk-11.0.2
+
+if [ ! -f "/Library/Java/JavaVirtualMachines/$JDK.jdk/Contents/Home/jre/lib/jli/libjli.dylib" ]
+then
+  echo $JDK is not set up correctly...  Run the following:
+  if [ ! -d "/Library/Java/JavaVirtualMachines/$JDK.jdk/Contents/Home/jre/lib/jli" ]
+  then
+    echo "sudo mkdir -p /Library/Java/JavaVirtualMachines/$JDK.jdk/Contents/Home/jre/lib/jli"
+  fi
+  echo "cd /Library/Java/JavaVirtualMachines/$JDK.jdk/Contents/Home/jre/lib/jli"
+  echo "sudo ln -s ../../../../Home/lib/jli/libjli.dylib ."
+  echo "cd -"
+  exit
+fi
+
+if mvn package
+then
+  java -jar changexml/target/change-xml-1.0-SNAPSHOT.jar \
+  --JVMRuntimePath \
+  --/Library/Java/JavaVirtualMachines/$JDK.jdk \
+  target/QuickLinkFx-1.0-SNAPSHOT/QuickLink.app/Contents/Info.plist
+fi

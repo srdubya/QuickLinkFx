@@ -59,7 +59,7 @@ public class ExportController implements Initializable {
 
     public static void showDialog(Window owner) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("Export/Export.fxml"));
+        loader.setLocation(Main.class.getResource("/Export.fxml"));
         AnchorPane page = loader.load();
 
         Stage dialogStage = new Stage();

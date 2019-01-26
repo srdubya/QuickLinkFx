@@ -1,5 +1,6 @@
 package com.srdubya.QuickLink;
 
+import com.srdubya.QuickLink.Choose.ChooseLinkController;
 import com.srdubya.QuickLink.Crypto.Crypto;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
@@ -12,13 +13,14 @@ import javafx.scene.control.Control;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+//import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.security.Security;
+import java.util.LinkedList;
 import java.util.prefs.Preferences;
 
 public class Main extends Application {
@@ -34,8 +36,9 @@ public class Main extends Application {
     private static final LinkEntryList masterData;
     private static final FilteredList<LinkEntry> filteredData;
     private static final SortedList<LinkEntry> links;
+    private static final ApplicationContext context = new ApplicationContext();
 
-    public static ObservableList<LinkEntry> getLinks() {
+    static ObservableList<LinkEntry> getLinks() {
         return links;
     }
 
@@ -44,11 +47,11 @@ public class Main extends Application {
         masterData = new LinkEntryList();
         filteredData = new FilteredList<>(masterData, entry -> true);
         links = new SortedList<>(filteredData);
-        Security.addProvider(new BouncyCastleProvider());
+  //      Security.addProvider(new BouncyCastleProvider());
     }
 
     private static Control defaultControl;
-    public static void setDefaultControl(Control control) {
+    static void setDefaultControl(Control control) {
         defaultControl = control;
     }
     private static MainController controller;
@@ -62,7 +65,7 @@ public class Main extends Application {
             return;
         }
 
-        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/Main.fxml"));
         primaryStage.setTitle("QuickLink");
         primaryStage.setScene(new Scene(
                 root,
@@ -89,10 +92,14 @@ public class Main extends Application {
                 defaultControl.requestFocus();
                 primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> Main.appPreferences.putDouble(WindowWidthKey, newVal.doubleValue()));
                 primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> Main.appPreferences.putDouble(WindowHeightKey, newVal.doubleValue()));
+                updateFilter("");
             }
         }));
         try {
             primaryStage.show();
+            context.addChangeListener(aBoolean -> {
+                controller.setIsErrorLabelVisible(aBoolean);
+            });
         } catch(NullPointerException e) {
             // do nothing
         }
@@ -124,6 +131,10 @@ public class Main extends Application {
         }
     }
 
+    public static ApplicationContext getContext() {
+        return context;
+    }
+
     private static String getHomeFolder() {
         return System.getProperty("user.home") + System.getProperty("file.separator");
     }
@@ -140,7 +151,7 @@ public class Main extends Application {
         try {
             File backupFile = getBackupFile();
             File file = getDataFile();
-            if(file.exists()) {
+            if (file.exists() && !context.isError()) {
                 if (backupFile.exists()) {
                     Files.delete(backupFile.toPath());
                 }
@@ -154,7 +165,9 @@ public class Main extends Application {
     }
 
     public static void saveToFile(File file) throws IOException {
-        masterData.toFile(file.getPath());
+        if (!context.isError()) {
+            masterData.toFile(file.getPath());
+        }
     }
 
     private static void fromFile() {
@@ -165,6 +178,19 @@ public class Main extends Application {
         if (!dataFile.exists()) {
             return;
         }
-        LinkEntry.forEach(dataFile.getPath(), masterData::add);
+        LinkEntry.forEach(
+                dataFile.getPath(),
+                entry -> masterData.add(entry, ChooseLinkController::addPotentialDuplicate)
+        );
+
+        for (var potentialDuplicate : ChooseLinkController.getPotentialDuplicates()) {
+            masterData.add(potentialDuplicate,
+                    (linkEntries, linkEntries2) -> ChooseLinkController.chooseLinks(
+                            defaultControl.getScene().getWindow(),
+                            linkEntries,
+                            linkEntries2
+                    ));
+        }
+        ChooseLinkController.clearPotentialDuplicates();
     }
 }

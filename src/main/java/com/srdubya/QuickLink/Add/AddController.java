@@ -93,7 +93,7 @@ public class AddController implements Initializable {
             throw new IllegalArgumentException("Argument 'handler' cannot be null");
         }
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("Add/Add.fxml"));
+        loader.setLocation(Main.class.getResource("/Add.fxml"));
         AnchorPane page = loader.load();
 
         // Create the dialog Stage.

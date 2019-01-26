@@ -83,10 +83,14 @@ public class LinkEntry {
                         case "close":
                             close = reader.nextBoolean();
                             break;
+                        case "isChosen":
+                            reader.nextBoolean();
+                            break;
                     }
                 }
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+                Main.getContext().setError(true);
             }
         }
     }
@@ -99,6 +103,7 @@ public class LinkEntry {
     private transient SimpleStringProperty password = null;
     private final SimpleBooleanProperty close = new SimpleBooleanProperty();
     private String encryptedPassword = null;
+    private transient final SimpleBooleanProperty isChosen = new SimpleBooleanProperty();
 
     public String getName() {
         return name.get();
@@ -160,8 +165,20 @@ public class LinkEntry {
         this.path.set(path);
     }
 
+    public boolean isChosen() {
+        return isChosen.get();
+    }
+
+    public SimpleBooleanProperty isChosenProperty() {
+        return isChosen;
+    }
+
+    public void setIsChosen(boolean isChosen) {
+        this.isChosen.set(isChosen);
+    }
+
     private void initializePassword() {
-        if(password == null) {
+        if (password == null) {
             password = new SimpleStringProperty();
             password.set(encryptedPassword == null ? "" : Crypto.Decrypt(encryptedPassword));
         }
@@ -197,16 +214,14 @@ public class LinkEntry {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof LinkEntry) {
+        if (obj instanceof LinkEntry) {
             LinkEntry that = (LinkEntry) obj;
-            if(this.name.getValue().equals(that.name.getValue())) {
+            if (this.name.getValue().equals(that.name.getValue())) {
                 if (this.login.getValue().equals(that.login.getValue())) {
                     if (this.email.getValue().equals(that.email.getValue())) {
-                        if (this.app.getValue().equals(that.app.getValue())) {
-                            if (this.path.getValue().equals(that.path.getValue())) {
-                                if (this.password.getValue().equals(that.password.getValue())) {
-                                    return this.close.getValue().equals(that.close.getValue());
-                                }
+                        if (this.path.getValue().equals(that.path.getValue())) {
+                            if (this.password.getValue().equals(that.password.getValue())) {
+                                return this.close.getValue().equals(that.close.getValue());
                             }
                         }
                     }
@@ -215,6 +230,13 @@ public class LinkEntry {
         }
         return false;
     }
+
+    public boolean isNearly(LinkEntry e) {
+        return ((e.getPath().length() > 0 && e.getPath().equalsIgnoreCase(this.getPath())) ||
+                        (e.getPath().length() == 0 && e.getName().equalsIgnoreCase(this.getName())))
+                && (e.getLogin().equals(this.getLogin()));
+    }
+
 
     public boolean contains(String filter) {
         String f = filter.toLowerCase();

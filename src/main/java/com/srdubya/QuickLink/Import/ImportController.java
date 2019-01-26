@@ -62,7 +62,7 @@ public class ImportController implements Initializable {
             throw new IllegalArgumentException("Argument 'handler' cannot be null");
         }
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("Import/Import.fxml"));
+        loader.setLocation(Main.class.getResource("/Import.fxml"));
         AnchorPane page = loader.load();
 
         // Create the dialog Stage.

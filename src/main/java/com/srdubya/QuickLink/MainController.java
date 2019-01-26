@@ -13,6 +13,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Side;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -54,6 +55,7 @@ public final class MainController implements Initializable {
 
     @FXML private TextField searchTextField;
     @FXML private CheckBox showPasswordCheckBox;
+    @FXML private Label isErrorLabel;
     @FXML private AnchorPane topAnchorPane;
 
     @FXML private ContextMenu tableContextMenu;
@@ -109,6 +111,10 @@ public final class MainController implements Initializable {
 
     public void setStage(Stage stage) {
         this.stage = stage;
+    }
+
+    void setIsErrorLabelVisible(boolean visible) {
+        isErrorLabel.setVisible(visible);
     }
 
     private void launch(LinkEntry item) {
@@ -249,26 +255,43 @@ public final class MainController implements Initializable {
     @FXML private void onExitMenuItemClicked() {
         stage.close();
     }
+    
+    @FXML private void onResetPassword() { resetPassword(stage); }
+
+    private void resetPassword(Stage stage) {
+        String password;
+        try {
+            password = CryptoInitController.getPassword(topAnchorPane.getScene().getWindow());
+            if (CryptoInitController.isPasswordAcceptable(password)) {
+                Main.getContext().setError(false);
+                password = Crypto.encryptPreference(password);
+                Main.appPreferences.put(AppPasswordKey, password);
+                Crypto.initialize(Crypto.decryptPreference(password));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     void initCrypto(Stage primaryStage) {
         boolean loop = true;
-        String tmp = Main.appPreferences.get(AppPasswordKey, "");
+        String password = Main.appPreferences.get(AppPasswordKey, "");
         while (loop) {
             try {
-                if (tmp.equals("")) {
-                    tmp = CryptoInitController.getPassword(topAnchorPane.getScene().getWindow());
-                    if (tmp.length() < CryptoInitController.MIN_PASSWORD_LEN) {
+                if (password.equals("")) {
+                    password = CryptoInitController.getPassword(topAnchorPane.getScene().getWindow());
+                    if (!CryptoInitController.isPasswordAcceptable(password)) {
                         primaryStage.close();   // because user must have cancelled the password dialog
                         return;
                     }
-                    tmp = Crypto.encryptPreference(tmp);
-                    Main.appPreferences.put(AppPasswordKey, tmp);
+                    password = Crypto.encryptPreference(password);
+                    Main.appPreferences.put(AppPasswordKey, password);
                 }
-                Crypto.initialize(Crypto.decryptPreference(tmp));
+                Crypto.initialize(Crypto.decryptPreference(password));
                 loop = false;
             } catch (Exception e) {
                 e.printStackTrace();
-                tmp = "";
+                password = "";
             }
         }
     }

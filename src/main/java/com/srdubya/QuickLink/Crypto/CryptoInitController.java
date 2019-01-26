@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class CryptoInitController implements Initializable {
+public class CryptoInitController extends AnchorPane implements Initializable {
 
     public static final int MIN_PASSWORD_LEN = 8;
 
@@ -26,6 +26,10 @@ public class CryptoInitController implements Initializable {
     private Stage dialogStage;
     private static CryptoInitController self;
 
+    public static boolean isPasswordAcceptable(String password) {
+        return password.length() >= MIN_PASSWORD_LEN;
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         passwordTextField.textProperty().addListener((obs, oldVal, newVal) -> handlePasswordChanges(newVal));
@@ -33,7 +37,7 @@ public class CryptoInitController implements Initializable {
 
     public static String getPassword(Window owner) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(Main.class.getResource("Crypto/CryptoInit.fxml"));
+        loader.setLocation(Main.class.getResource("/CryptoInit.fxml"));
         AnchorPane page = loader.load();
 
         Stage dialogStage = new Stage();
