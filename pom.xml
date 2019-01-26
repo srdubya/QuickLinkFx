@@ -37,7 +37,7 @@
             <activation>
                 <os>
                     <family>mac</family>
-                    <name>mac</name>
+                    <name>mac os x</name>
                 </os>
             </activation>
             <build>

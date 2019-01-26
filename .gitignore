@@ -78,5 +78,6 @@ crashlytics-build.properties
 fabric.properties
 
 QuickLink.icns
+QuickLink.iml
 QuickLinkFx.iml
 changexml/changexml.iml
