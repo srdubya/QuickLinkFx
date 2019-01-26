@@ -131,6 +131,8 @@ public final class MainController implements Initializable {
                 new ProcessBuilder(app.getPath(), path).start();
             } else if (path.toLowerCase().startsWith("http")) {
                 Desktop.getDesktop().browse(new URI(path));
+            } else if (path.toLowerCase().startsWith("www.")) {
+                Desktop.getDesktop().browse(new URI("http://" + path));
             } else {
                 File file = new File(path);
                 if (!file.exists()) {
