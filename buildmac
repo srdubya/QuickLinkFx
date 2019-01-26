@@ -15,7 +15,7 @@ then
   exit
 fi
 
-if mvn package
+if mvn -P platform-mac package
 then
   java -jar changexml/target/change-xml-1.0-SNAPSHOT.jar \
   --JVMRuntimePath \
