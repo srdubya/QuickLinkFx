@@ -3,11 +3,7 @@ package com.srdubya;
 import java.io.*;
 import java.util.LinkedList;
 
-/**
- * Hello world!
- *
- */
-public class App 
+public class App
 {
     public static void main( String[] args ) {
         if (args.length != 3) {
