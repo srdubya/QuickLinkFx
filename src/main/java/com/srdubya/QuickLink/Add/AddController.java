@@ -27,7 +27,6 @@ public class AddController implements Initializable {
 
     private boolean dialogResult;
 
-    @FXML private Button findAppBtn;
     @FXML private Button findFolderBtn;
     @FXML private Button findFileBtn;
     @FXML private Button okBtn;
@@ -250,7 +249,7 @@ public class AddController implements Initializable {
             int length = Integer.parseInt(this.passwordLengthTextField.getText());
             passwordTextField.setText(Password.getPassword(length));
         } catch (NumberFormatException ex) {
-            return;
+            ex.printStackTrace();
         }
     }
 
