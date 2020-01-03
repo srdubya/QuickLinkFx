@@ -83,7 +83,7 @@ public class AddController implements Initializable {
     }
 
     public interface NewLinkEntryHandler {
-        void operation(LinkEntry element);
+        void operation(LinkEntry element) throws IOException;
     }
 
     private NewLinkEntryHandler newLinkEntryHandler;
@@ -203,24 +203,25 @@ public class AddController implements Initializable {
             tmp.setPassword(passwordField.getText());
             tmp.setClose(exitUponUseCB.isSelected());
 
-            newLinkEntryHandler.operation(tmp);
-
-            File lastPath = new File(pathTextField.getText());
-            if(lastPath.exists()) {
-                Main.appPreferences.put(LastPathDirectoryKey, lastPath.getParentFile().getPath());
-                if(lastPath.isFile()) {
-                    Main.appPreferences.put(LastPathFileKey, lastPath.getPath());
-                }
-            }
-            File lastApp = new File(appTextField.getText());
-            if (lastApp.exists() && Files.isExecutable(lastApp.toPath())) {
-                Main.appPreferences.put(LastAppKey, lastApp.getPath());
-            }
-
             try {
+                newLinkEntryHandler.operation(tmp);
+
+                File lastPath = new File(pathTextField.getText());
+                if (lastPath.exists()) {
+                    Main.appPreferences.put(LastPathDirectoryKey, lastPath.getParentFile().getPath());
+                    if (lastPath.isFile()) {
+                        Main.appPreferences.put(LastPathFileKey, lastPath.getPath());
+                    }
+                }
+                File lastApp = new File(appTextField.getText());
+                if (lastApp.exists() && Files.isExecutable(lastApp.toPath())) {
+                    Main.appPreferences.put(LastAppKey, lastApp.getPath());
+                }
+
                 int pwLength = Integer.parseInt(passwordLengthTextField.getText());
                 Main.appPreferences.putInt(LastPasswordLengthKey, pwLength);
-            } catch (NumberFormatException ex) {
+            } catch (NumberFormatException | IOException ex) {
+                ex.printStackTrace();
             }
         }
         dialogStage.close();

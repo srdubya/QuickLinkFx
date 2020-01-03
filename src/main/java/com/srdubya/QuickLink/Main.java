@@ -17,7 +17,8 @@ import javafx.stage.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.prefs.Preferences;
 
 //import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -36,6 +37,7 @@ public class Main extends Application {
     private static final FilteredList<LinkEntry> filteredData;
     private static final SortedList<LinkEntry> links;
     private static final ApplicationContext context = new ApplicationContext();
+    private static final QuickLinkFile dataFile = new QuickLinkFile();
 
     static ObservableList<LinkEntry> getLinks() {
         return links;
@@ -96,9 +98,7 @@ public class Main extends Application {
         }));
         try {
             primaryStage.show();
-            context.addChangeListener(aBoolean -> {
-                controller.setIsErrorLabelVisible(aBoolean);
-            });
+            context.addChangeListener(aBoolean -> controller.setIsErrorLabelVisible(aBoolean));
         } catch(NullPointerException e) {
             // do nothing
         }
@@ -111,7 +111,17 @@ public class Main extends Application {
     }
 
     public static void main(String[] args) {
-        launch(args);
+        launch(
+                Arrays.stream(args)
+                        .filter(arg -> {
+                            if (Files.exists(Path.of(arg))) {
+                                dataFile.setFilename(arg);
+                                return false;
+                            }
+                            return true;
+                        })
+                        .toArray(String[] ::new)
+        );
     }
 
     public static void addLinkEntry(LinkEntry entry) {
@@ -134,30 +144,16 @@ public class Main extends Application {
         return context;
     }
 
-    private static String getHomeFolder() {
-        return System.getProperty("user.home") + System.getProperty("file.separator");
-    }
-
-    private static File getBackupFile() {
-        return new File(getHomeFolder() +".quicklinkbackup.json");
-    }
-
-    private static File getDataFile() {
-        return new File(getHomeFolder() + ".quicklink.json");
-    }
-
-    public static void saveToFile() {
-        try {
-            File backupFile = getBackupFile();
-            File file = getDataFile();
-            if (file.exists() && !context.isError()) {
-                Files.copy(file.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }
-            saveToFile(file);
-        } catch(Exception e) {
-            e.printStackTrace();
+    public static void saveToFile() throws IOException {
+        if (!context.isError()) {
+            dataFile.backup().run(filename -> {
+                    try {
+                        masterData.toFile(filename);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
         }
-
     }
 
     public static void saveToFile(File file) throws IOException {
@@ -167,20 +163,20 @@ public class Main extends Application {
     }
 
     private static void fromFile() {
-        addLinksFromFile(getDataFile());
+        dataFile.run(filename -> addLinksFromFile(new File(filename)));
     }
 
-    public static int addLinksFromFile(File dataFile) {
-        if (!dataFile.exists()) {
+    public static int addLinksFromFile(File theFile) {
+        if (!theFile.exists()) {
             return 0;
         }
 
         final int[] count = {0};
 
         LinkEntry.forEach(
-                dataFile.getPath(),
+                theFile.getPath(),
                 entry -> {
-                    if (masterData.add(entry, ChooseLinkController::addPotentialDuplicate) ){
+                    if (masterData.add(entry, ChooseLinkController::addPotentialDuplicate) ) {
                         count[0]++;
                     }
                 }

@@ -27,7 +27,7 @@ public class ConfirmDeleteController implements Initializable {
     }
 
     public interface DeleteLinkHandler {
-        void deleteLink(LinkEntry link);
+        void deleteLink(LinkEntry link) throws IOException;
     }
 
     private LinkEntry targetEntry;
@@ -62,7 +62,11 @@ public class ConfirmDeleteController implements Initializable {
     }
 
     @FXML private void onConfirmBtnClicked() {
-        deleteHandler.deleteLink(targetEntry);
+        try {
+            deleteHandler.deleteLink(targetEntry);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dialogStage.close();
     }
 
