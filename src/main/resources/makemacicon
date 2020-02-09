@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -d QuickLink.iconset ]; then
+    echo "remove QuickLink.iconset folder and try again"
+    exit 1
+fi
+
+mkdir QuickLink.iconset
+
+for i in 16 32 128 256 512; do
+    cp star${i}x${i}.png QuickLink.iconset/icon_${i}x${i}.png
+    cp star${i}x${i}@2x.png QuickLink.iconset/icon_${i}x${i}@2x.png
+done
+
+iconutil -c icns QuickLink.iconset && rm -R QuickLink.iconset
