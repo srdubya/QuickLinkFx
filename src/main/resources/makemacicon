@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ -d QuickLink.iconset ]; then
     echo "remove QuickLink.iconset folder and try again"
