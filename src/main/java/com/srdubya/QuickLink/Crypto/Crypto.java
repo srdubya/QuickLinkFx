@@ -82,12 +82,8 @@ public class Crypto {
     }
 
     public static void initialize(String password) {
-        if(instance == null) {
-            synchronized (basePassword) {
-                if(instance == null) {
-                    instance = new Crypto(password);
-                }
-            }
+        synchronized (basePassword) {
+            instance = new Crypto(password);
         }
     }
 
@@ -105,6 +101,8 @@ public class Crypto {
         if(instance == null) {
             throw new UnsupportedOperationException(INIT_REQD);
         }
+        String test = instance.textEncryptor.encrypt("This is a test");
+        String result = instance.textEncryptor.decrypt(test);
         return instance.textEncryptor.decrypt(encryptedText);
     }
 

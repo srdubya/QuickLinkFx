@@ -150,6 +150,7 @@ public class ImportController implements Initializable {
         } finally {
             if(isCryptoReInited) {
                 Crypto.initialize(Crypto.decryptPreference(Main.appPreferences.get(MainController.AppPasswordKey, "")));
+                Main.resetEncryptedPasswords();
             }
             dialogStage.close();
         }

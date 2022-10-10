@@ -269,6 +269,8 @@ public final class MainController implements Initializable {
                 password = Crypto.encryptPreference(password);
                 Main.appPreferences.put(AppPasswordKey, password);
                 Crypto.initialize(Crypto.decryptPreference(password));
+                Main.resetEncryptedPasswords();
+                Main.saveToFile();
             }
         } catch (IOException e) {
             e.printStackTrace();

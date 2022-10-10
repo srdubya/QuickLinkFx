@@ -2,12 +2,15 @@ module QuickLinkFx {
     requires java.desktop;
     requires java.prefs;
     requires java.sql;
-    requires fx.gson;
-    requires gson;
+//    requires fx.gson;
+    requires com.google.gson;
     requires jasypt;
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.graphics;
+//    requires org.bouncycastle.pkix;
+//    requires org.bouncycastle.provider;
+    requires org.hildan.fxgson;
     exports com.srdubya.QuickLink;
     exports com.srdubya.QuickLink.Add;
     exports com.srdubya.QuickLink.Choose;

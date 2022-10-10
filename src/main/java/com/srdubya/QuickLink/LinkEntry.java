@@ -200,6 +200,10 @@ public class LinkEntry {
         this.encryptedPassword = Crypto.Encrypt(password);
     }
 
+    public void reEncryptPassword() {
+        this.encryptedPassword = Crypto.Encrypt(getPassword());
+    }
+
     public boolean isClose() {
         return close.get();
     }

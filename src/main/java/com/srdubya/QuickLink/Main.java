@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+//import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
@@ -48,7 +50,8 @@ public class Main extends Application {
         masterData = new LinkEntryList();
         filteredData = new FilteredList<>(masterData, entry -> true);
         links = new SortedList<>(filteredData);
-  //      Security.addProvider(new BouncyCastleProvider());
+        Security.setProperty("crypto.policy", "unlimited");
+//        Security.addProvider(new BouncyCastleProvider());
     }
 
     private static Control defaultControl;
@@ -59,6 +62,7 @@ public class Main extends Application {
     public static void setController(MainController theController) {
         controller = theController;
     }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -166,6 +170,11 @@ public class Main extends Application {
         dataFile.run(filename -> addLinksFromFile(new File(filename)));
     }
 
+    public static void resetEncryptedPasswords() {
+        masterData.forEach(linkEntry -> {
+            linkEntry.reEncryptPassword();
+        });
+    }
     public static int addLinksFromFile(File theFile) {
         if (!theFile.exists()) {
             return 0;
